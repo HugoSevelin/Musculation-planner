@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { storage } from "@/lib/storage"
 import type { Program, ProgramDay } from "@/lib/types"
+import { Button } from "@/components/ui/button"
 
 const DAY_NAMES_FR = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
 const JS_TO_PROGRAM_INDEX = [6, 0, 1, 2, 3, 4, 5]
@@ -45,14 +46,14 @@ export function TodayView({ onGoToProgram, onStartSession }: TodayViewProps) {
             <p className="text-sm font-semibold text-[#efefef]">Aucun programme configuré</p>
             <p className="mt-1 text-xs text-[#555]">Crée ton premier programme pour commencer à logger tes séances.</p>
           </div>
-          <button
+          <Button
             onClick={onGoToProgram}
-            className="flex w-full items-center justify-between px-5 py-4 text-sm font-bold uppercase tracking-widest transition-opacity hover:opacity-80"
+            className="flex w-full items-center justify-between rounded-none px-5 py-4 h-auto text-sm font-bold uppercase tracking-widest hover:opacity-80"
             style={{ backgroundColor: LIME, color: "#0d0d0d" }}
           >
             Créer un programme
             <span>→</span>
-          </button>
+          </Button>
         </div>
       )}
 
@@ -79,14 +80,15 @@ export function TodayView({ onGoToProgram, onStartSession }: TodayViewProps) {
             <p className="text-lg font-bold text-[#efefef]">{todayDay.name}</p>
             <p className="mt-2 text-sm text-[#555]">Aucun exercice planifié pour ce jour.</p>
           </div>
-          <button
+          <Button
+            variant="ghost"
             onClick={onGoToProgram}
-            className="flex w-full items-center justify-between px-5 py-4 text-xs uppercase tracking-widest text-[#444] transition-colors hover:text-[#efefef]"
+            className="flex w-full items-center justify-between rounded-none px-5 py-4 h-auto text-xs uppercase tracking-widest text-[#444] hover:text-[#efefef] hover:bg-transparent"
             style={{ borderTop: `1px solid ${BORDER}` }}
           >
             Modifier dans Planning
             <span>→</span>
-          </button>
+          </Button>
         </div>
       )}
 
@@ -123,9 +125,9 @@ export function TodayView({ onGoToProgram, onStartSession }: TodayViewProps) {
           })}
 
           {/* CTA */}
-          <button
+          <Button
             onClick={() => onStartSession(todayDay)}
-            className="flex w-full items-center justify-between px-5 py-4 text-sm font-bold uppercase tracking-widest transition-opacity hover:opacity-80"
+            className="flex w-full items-center justify-between rounded-none px-5 py-4 h-auto text-sm font-bold uppercase tracking-widest hover:opacity-80"
             style={{
               backgroundColor: LIME,
               color: "#0d0d0d",
@@ -135,7 +137,7 @@ export function TodayView({ onGoToProgram, onStartSession }: TodayViewProps) {
           >
             Commencer la séance
             <span>→</span>
-          </button>
+          </Button>
         </div>
       )}
 

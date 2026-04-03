@@ -5,6 +5,7 @@ import { ArrowLeft01Icon, Tick01Icon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { storage } from "@/lib/storage"
 import type { ProgramDay, Exercise, Session, WorkoutSet } from "@/lib/types"
+import { Button } from "@/components/ui/button"
 
 const LIME = "#b8ff00"
 const CYAN = "#00e5ff"
@@ -179,20 +180,21 @@ export function WorkoutSession({ day, onFinish, onCancel, onGoToHistory }: Worko
         </div>
 
         {/* Bouton retour */}
-        <button
+        <Button
           onClick={onFinish}
-          className="mt-6 flex w-full items-center justify-center py-4 text-sm font-black uppercase tracking-widest transition-opacity hover:opacity-80"
+          className="mt-6 w-full rounded-none py-4 h-auto text-sm font-black uppercase tracking-widest hover:opacity-80"
           style={{ backgroundColor: LIME, color: "#0d0d0d" }}
         >
           Retour à l&apos;accueil
-        </button>
+        </Button>
         {onGoToHistory && (
-          <button
+          <Button
+            variant="ghost"
             onClick={() => { onFinish(); onGoToHistory() }}
-            className="mt-3 text-[11px] uppercase tracking-widest text-[#444] hover:text-[#efefef] transition-colors"
+            className="mt-3 text-[11px] uppercase tracking-widest text-[#444] hover:text-[#efefef] hover:bg-transparent"
           >
             Voir l&apos;historique →
-          </button>
+          </Button>
         )}
       </div>
     )
@@ -202,9 +204,9 @@ export function WorkoutSession({ day, onFinish, onCancel, onGoToHistory }: Worko
     <div className="flex min-h-svh flex-col bg-[#0d0d0d]">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
-        <button onClick={onCancel} className="text-[#444] hover:text-[#efefef] transition-colors">
+        <Button variant="ghost" size="icon" onClick={onCancel} className="text-[#444] hover:text-[#efefef] hover:bg-transparent">
           <HugeiconsIcon icon={ArrowLeft01Icon} size={22} color="currentColor" />
-        </button>
+        </Button>
         <div className="flex-1">
           <p className="text-base font-bold text-[#efefef]">{day.name}</p>
           <p className="font-mono text-[10px] text-[#444]">
@@ -339,13 +341,14 @@ export function WorkoutSession({ day, onFinish, onCancel, onGoToHistory }: Worko
               ))}
 
               {/* Add set */}
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => addSet(exIdx)}
-                className="flex w-full items-center justify-center py-3 text-[10px] uppercase tracking-widest text-[#333] transition-colors hover:text-[#efefef]"
+                className="w-full rounded-none py-3 h-auto text-[10px] uppercase tracking-widest text-[#333] hover:text-[#efefef] hover:bg-transparent"
                 style={{ borderTop: `1px solid rgba(255,255,255,0.04)` }}
               >
                 + Ajouter une série
-              </button>
+              </Button>
             </div>
           )
         })}
@@ -356,9 +359,9 @@ export function WorkoutSession({ day, onFinish, onCancel, onGoToHistory }: Worko
         className="fixed bottom-0 left-0 right-0 p-4"
         style={{ backgroundColor: "#0d0d0d", borderTop: `1px solid ${BORDER}` }}
       >
-        <button
+        <Button
           onClick={finishSession}
-          className="flex w-full items-center justify-between px-5 py-4 text-sm font-black uppercase tracking-widest transition-opacity hover:opacity-80"
+          className="flex w-full items-center justify-between rounded-none px-5 py-4 h-auto text-sm font-black uppercase tracking-widest hover:opacity-80"
           style={{
             backgroundColor: completedSets > 0 ? LIME : "#1a1a1a",
             color: completedSets > 0 ? "#0d0d0d" : "#444",
@@ -367,7 +370,7 @@ export function WorkoutSession({ day, onFinish, onCancel, onGoToHistory }: Worko
         >
           <span>Finir la séance</span>
           <span className="font-mono text-sm">{formatElapsed(elapsed)}</span>
-        </button>
+        </Button>
       </div>
     </div>
   )

@@ -7,6 +7,8 @@ import { storage } from "@/lib/storage"
 import type { Program, ProgramDay, ProgramExercise, Exercise } from "@/lib/types"
 import { MUSCLE_GROUP_LABELS } from "@/lib/exercises"
 import { ExercisePicker } from "./ExercisePicker"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 const DAY_NAMES = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
 const DAY_SHORT = ["LUN", "MAR", "MER", "JEU", "VEN", "SAM", "DIM"]
@@ -90,14 +92,14 @@ function Onboarding({ onCreate }: { onCreate: () => void }) {
       </div>
 
       {/* CTA */}
-      <button
+      <Button
         onClick={onCreate}
-        className="flex w-full items-center justify-between px-5 py-4 text-sm font-bold uppercase tracking-widest transition-opacity hover:opacity-80"
+        className="flex w-full items-center justify-between rounded-none px-5 py-4 h-auto text-sm font-bold uppercase tracking-widest hover:opacity-80"
         style={{ backgroundColor: LIME, color: "#0d0d0d", boxShadow: `0 0 24px rgba(184,255,0,0.25)` }}
       >
         Créer mon programme
         <span>→</span>
-      </button>
+      </Button>
 
       <p className="mt-4 text-center text-[10px] text-[#333]">Données stockées localement · aucun compte requis</p>
     </div>
@@ -235,9 +237,9 @@ export function ProgramBuilder() {
         {!isEmpty && (
           <div className="flex items-center justify-between px-4 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
             <p className="text-[10px] uppercase tracking-[0.2em] text-[#efefef]">Planning</p>
-            <button onClick={() => setCreatingProgram(true)} className="transition-opacity hover:opacity-60">
+            <Button variant="ghost" size="icon" onClick={() => setCreatingProgram(true)} className="hover:bg-transparent hover:opacity-60">
               <HugeiconsIcon icon={Add01Icon} size={22} color="#efefef" />
-            </button>
+            </Button>
           </div>
         )}
 
@@ -250,7 +252,7 @@ export function ProgramBuilder() {
             <div className="px-4 pt-3 pb-2">
               <p className="text-[10px] uppercase tracking-widest text-[#444]">Nouveau programme</p>
             </div>
-            <input
+            <Input
               autoFocus
               type="text"
               placeholder="Ex: PPL, Full Body, Ma routine..."
@@ -260,24 +262,25 @@ export function ProgramBuilder() {
                 if (e.key === "Enter") createProgram()
                 if (e.key === "Escape") { setCreatingProgram(false); setNewProgramName("") }
               }}
-              className="w-full bg-transparent px-4 py-3 text-base text-[#efefef] placeholder-[#444] focus:outline-none"
+              className="rounded-none border-0 bg-transparent px-4 py-3 h-auto text-base text-[#efefef] placeholder:text-[#444] focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             <div className="flex" style={{ borderTop: `1px solid ${BORDER}` }}>
-              <button
+              <Button
                 onClick={() => createProgram()}
                 disabled={!newProgramName.trim()}
-                className="flex-1 py-3 text-xs font-bold uppercase tracking-widest disabled:opacity-30 transition-opacity hover:opacity-80"
+                className="flex-1 rounded-none py-3 h-auto text-xs font-bold uppercase tracking-widest disabled:opacity-30 hover:opacity-80"
                 style={{ backgroundColor: LIME, color: "#0d0d0d" }}
               >
                 Créer →
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={() => { setCreatingProgram(false); setNewProgramName("") }}
-                className="px-5 py-3 text-xs uppercase tracking-widest text-[#444] hover:text-[#efefef] transition-colors"
+                className="rounded-none px-5 py-3 h-auto text-xs uppercase tracking-widest text-[#444] hover:text-[#efefef] hover:bg-transparent"
                 style={{ borderLeft: `1px solid ${BORDER}` }}
               >
                 Annuler
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -320,12 +323,12 @@ export function ProgramBuilder() {
                   <span className="ml-4 text-lg text-[#333]">›</span>
                 </button>
                 <div className="flex items-center" style={{ borderLeft: `1px solid ${BORDER}` }}>
-                  <button onClick={() => setEditingName(program.id)} className="px-3 py-4 text-[#444] hover:text-[#efefef] transition-colors">
+                  <Button variant="ghost" size="icon" onClick={() => setEditingName(program.id)} className="rounded-none px-3 py-4 h-auto text-[#444] hover:text-[#efefef] hover:bg-transparent">
                     <HugeiconsIcon icon={PencilEdit01Icon} size={16} color="currentColor" />
-                  </button>
-                  <button onClick={() => deleteProgram(program.id)} className="px-3 py-4 text-[#444] hover:text-[#ff3333] transition-colors" style={{ borderLeft: `1px solid ${BORDER}` }}>
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => deleteProgram(program.id)} className="rounded-none px-3 py-4 h-auto text-[#444] hover:text-[#ff3333] hover:bg-transparent" style={{ borderLeft: `1px solid ${BORDER}` }}>
                     <HugeiconsIcon icon={Delete01Icon} size={16} color="currentColor" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
@@ -345,9 +348,9 @@ export function ProgramBuilder() {
       <div className="flex flex-col">
         {/* Header */}
         <div className="flex items-center gap-3 px-4 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
-          <button onClick={() => setView({ type: "programs" })} className="text-[#444] hover:text-[#efefef] transition-colors">
+          <Button variant="ghost" size="icon" onClick={() => setView({ type: "programs" })} className="text-[#444] hover:text-[#efefef] hover:bg-transparent">
             <HugeiconsIcon icon={ArrowLeft01Icon} size={22} color="currentColor" />
-          </button>
+          </Button>
           <p className="flex-1 text-base font-semibold text-[#efefef]">{program.name}</p>
         </div>
 
@@ -359,7 +362,7 @@ export function ProgramBuilder() {
               <p className="text-xs text-[#efefef]">Appuie sur un jour actif pour ajouter tes exercices</p>
               <p className="mt-0.5 text-[10px] text-[#555]">Tu peux renommer chaque jour (Push, Pull, Jambes...)</p>
             </div>
-            <button onClick={() => setShowWeekTip(false)} className="text-[#444] text-xs hover:text-[#efefef]">✕</button>
+            <Button variant="ghost" size="icon" onClick={() => setShowWeekTip(false)} className="h-6 w-6 text-[#444] text-xs hover:text-[#efefef] hover:bg-transparent">✕</Button>
           </div>
         )}
 
@@ -446,9 +449,9 @@ export function ProgramBuilder() {
       <div className="flex flex-col">
         {/* Header */}
         <div className="flex items-center gap-3 px-4 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
-          <button onClick={() => setView({ type: "week", programId: view.programId })} className="text-[#444] hover:text-[#efefef] transition-colors">
+          <Button variant="ghost" size="icon" onClick={() => setView({ type: "week", programId: view.programId })} className="text-[#444] hover:text-[#efefef] hover:bg-transparent">
             <HugeiconsIcon icon={ArrowLeft01Icon} size={22} color="currentColor" />
-          </button>
+          </Button>
           <div className="flex-1 min-w-0">
             <DayNameEditor
               name={day.name}
@@ -481,9 +484,9 @@ export function ProgramBuilder() {
                       {MUSCLE_GROUP_LABELS[exercise.muscleGroup]}
                     </p>
                   </div>
-                  <button onClick={() => removeExercise(view.programId, view.dayIndex, exIndex)} className="text-[#333] hover:text-[#ff3333] transition-colors ml-3">
+                  <Button variant="ghost" size="icon" onClick={() => removeExercise(view.programId, view.dayIndex, exIndex)} className="ml-3 text-[#333] hover:text-[#ff3333] hover:bg-transparent">
                     <HugeiconsIcon icon={Delete01Icon} size={18} color="currentColor" />
-                  </button>
+                  </Button>
                 </div>
                 <ExerciseParamEditor
                   progEx={progEx} exercise={exercise}
@@ -495,9 +498,9 @@ export function ProgramBuilder() {
         </div>
 
         {/* Add button */}
-        <button
+        <Button
           onClick={() => setShowPicker(true)}
-          className="mx-4 mt-4 flex items-center justify-center gap-2 py-4 text-sm font-semibold uppercase tracking-widest transition-all hover:opacity-80"
+          className="mx-4 mt-4 flex items-center justify-center gap-2 rounded-none py-4 h-auto text-sm font-semibold uppercase tracking-widest hover:opacity-80"
           style={{
             border: `1px dashed rgba(184,255,0,0.3)`,
             color: LIME,
@@ -506,7 +509,7 @@ export function ProgramBuilder() {
         >
           <HugeiconsIcon icon={Add01Icon} size={18} color={LIME} />
           Ajouter un exercice
-        </button>
+        </Button>
 
         {showPicker && (
           <ExercisePicker
@@ -551,12 +554,13 @@ function DayNameEditor({ name, onChange }: { name: string; onChange: (n: string)
   }
 
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={() => { setValue(name); setEditing(true) }}
-      className="flex items-center gap-1.5 text-base font-semibold text-[#efefef] hover:opacity-70 transition-opacity"
+      className="h-auto p-0 flex items-center gap-1.5 text-base font-semibold text-[#efefef] hover:opacity-70 hover:bg-transparent"
     >
       {name}
       <HugeiconsIcon icon={PencilEdit01Icon} size={12} color="#444" />
-    </button>
+    </Button>
   )
 }

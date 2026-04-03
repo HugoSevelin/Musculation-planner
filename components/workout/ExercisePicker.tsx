@@ -6,6 +6,9 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import type { Exercise, MuscleGroup, SportType } from "@/lib/types"
 import { MUSCLE_GROUP_LABELS, ALL_MUSCLE_GROUPS, SPORT_TYPE_LABELS } from "@/lib/exercises"
 import { storage } from "@/lib/storage"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 
 interface ExercisePickerProps {
   exercises: Exercise[]
@@ -66,17 +69,22 @@ export function ExercisePicker({ exercises, onSelect, onClose, onExerciseCreated
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
         <HugeiconsIcon icon={Search01Icon} size={16} color="#444" />
-        <input
+        <Input
           autoFocus
           type="text"
           placeholder="Rechercher un exercice..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="flex-1 bg-transparent text-sm text-[#efefef] placeholder-[#444] focus:outline-none"
+          className="flex-1 border-0 bg-transparent p-0 h-auto text-sm text-[#efefef] placeholder:text-[#444] focus-visible:ring-0 focus-visible:ring-offset-0"
         />
-        <button onClick={onClose} className="text-[#444] hover:text-[#efefef] transition-colors p-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="text-[#444] hover:text-[#efefef] hover:bg-transparent h-8 w-8"
+        >
           <HugeiconsIcon icon={Cancel01Icon} size={20} color="currentColor" />
-        </button>
+        </Button>
       </div>
 
       {/* Category filters */}
@@ -84,10 +92,10 @@ export function ExercisePicker({ exercises, onSelect, onClose, onExerciseCreated
         {(["all", ...ALL_MUSCLE_GROUPS] as (MuscleGroup | "all")[]).map((group) => {
           const isActive = selectedGroup === group
           return (
-            <button
+            <Button
               key={group}
               onClick={() => setSelectedGroup(group)}
-              className="shrink-0 px-3 py-1.5 text-[10px] uppercase tracking-widest font-semibold transition-all"
+              className="shrink-0 rounded-none px-3 py-1.5 h-auto text-[10px] uppercase tracking-widest font-semibold transition-all"
               style={{
                 backgroundColor: isActive ? LIME : "transparent",
                 color: isActive ? "#0d0d0d" : "#444",
@@ -95,7 +103,7 @@ export function ExercisePicker({ exercises, onSelect, onClose, onExerciseCreated
               }}
             >
               {group === "all" ? "Tout" : MUSCLE_GROUP_LABELS[group]}
-            </button>
+            </Button>
           )
         })}
       </div>
@@ -123,15 +131,15 @@ export function ExercisePicker({ exercises, onSelect, onClose, onExerciseCreated
                 style={{ borderBottom: `1px solid rgba(255,255,255,0.04)` }}
               >
                 <span className="text-sm text-[#efefef]">{ex.name}</span>
-                <span
-                  className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5"
+                <Badge
+                  className="rounded-none text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 border bg-transparent"
                   style={{
                     color: ex.compound ? LIME : "#444",
-                    border: `1px solid ${ex.compound ? "rgba(184,255,0,0.3)" : "rgba(255,255,255,0.07)"}`,
+                    borderColor: ex.compound ? "rgba(184,255,0,0.3)" : "rgba(255,255,255,0.07)",
                   }}
                 >
                   {ex.compound ? "Poly" : "Iso"}
-                </span>
+                </Badge>
               </button>
             ))}
           </div>
@@ -140,9 +148,9 @@ export function ExercisePicker({ exercises, onSelect, onClose, onExerciseCreated
         {/* Custom exercise */}
         <div className="px-4 py-5 mt-2" style={{ borderTop: `1px solid ${BORDER}` }}>
           {!creatingCustom ? (
-            <button
+            <Button
               onClick={() => setCreatingCustom(true)}
-              className="flex w-full items-center justify-center gap-2 py-4 text-sm font-semibold uppercase tracking-widest transition-all hover:opacity-80"
+              className="flex w-full items-center justify-center gap-2 rounded-none py-4 h-auto text-sm font-semibold uppercase tracking-widest hover:opacity-80"
               style={{
                 border: `1px dashed rgba(184,255,0,0.3)`,
                 color: LIME,
@@ -151,11 +159,11 @@ export function ExercisePicker({ exercises, onSelect, onClose, onExerciseCreated
             >
               <HugeiconsIcon icon={Add01Icon} size={16} color={LIME} />
               Créer un exercice personnalisé
-            </button>
+            </Button>
           ) : (
             <div className="flex flex-col gap-4" style={{ backgroundColor: SURFACE, border: `1px solid ${BORDER}`, padding: "16px" }}>
               <p className="text-[10px] uppercase tracking-widest text-[#444]">Nouvel exercice</p>
-              <input
+              <Input
                 autoFocus
                 type="text"
                 placeholder="Nom de l'exercice..."
@@ -165,8 +173,7 @@ export function ExercisePicker({ exercises, onSelect, onClose, onExerciseCreated
                   if (e.key === "Enter") createCustomExercise()
                   if (e.key === "Escape") setCreatingCustom(false)
                 }}
-                className="w-full border-b bg-transparent py-2 text-base text-[#efefef] placeholder-[#444] focus:outline-none"
-                style={{ borderColor: "rgba(255,255,255,0.15)" }}
+                className="rounded-none border-0 border-b border-white/15 bg-transparent px-0 text-base text-[#efefef] placeholder:text-[#444] focus-visible:ring-0 focus-visible:ring-offset-0"
               />
               <div className="flex gap-2">
                 <select value={customGroup} onChange={(e) => setCustomGroup(e.target.value as MuscleGroup)} className={selectCls}>
@@ -177,21 +184,22 @@ export function ExercisePicker({ exercises, onSelect, onClose, onExerciseCreated
                 </select>
               </div>
               <div className="flex gap-2">
-                <button
+                <Button
                   onClick={createCustomExercise}
                   disabled={!customName.trim()}
-                  className="flex-1 py-3 text-sm font-bold uppercase tracking-widest disabled:opacity-30 transition-opacity hover:opacity-80"
+                  className="flex-1 rounded-none py-3 h-auto text-sm font-bold uppercase tracking-widest disabled:opacity-30 hover:opacity-80"
                   style={{ backgroundColor: LIME, color: "#0d0d0d" }}
                 >
                   Créer →
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="ghost"
                   onClick={() => { setCreatingCustom(false); setCustomName("") }}
-                  className="px-5 py-3 text-xs uppercase tracking-widest text-[#444] hover:text-[#efefef] transition-colors"
+                  className="rounded-none px-5 py-3 h-auto text-xs uppercase tracking-widest text-[#444] hover:text-[#efefef] hover:bg-transparent"
                   style={{ border: `1px solid ${BORDER}` }}
                 >
                   Annuler
-                </button>
+                </Button>
               </div>
             </div>
           )}
