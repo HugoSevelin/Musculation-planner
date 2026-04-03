@@ -4,7 +4,12 @@
       "Bash(powershell -Command \"Get-Command npm -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\")",
       "mcp__Claude_Preview__preview_start",
       "Read(//c/Users/hugos/Documents/GitHub/Musculation-planner/$USERPROFILE/Documents/GitHub/**)",
-      "Bash(bun run:*)"
+      "Bash(bun run:*)",
+      "Bash(npx shadcn@latest add input badge separator --yes)",
+      "Bash(bun add:*)",
+      "Bash(bun remove:*)",
+      "Bash(Start-Sleep -Seconds 10)",
+      "Bash(python3 -c \"import sys,json; logs=json.load\\(sys.stdin\\); errors=[l for l in logs if ''''error'''' in l.get\\(''''text'''',''''''''\\).lower\\(\\) or ''''Error'''' in l.get\\(''''text'''',''''''''\\)]; print\\(''''\\\\n''''.join\\(l[''''text''''][:300] for l in errors[:10]\\)\\)\")"
     ]
   }
 }

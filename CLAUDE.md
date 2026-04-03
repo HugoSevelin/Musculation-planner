@@ -20,6 +20,8 @@ npx shadcn@latest add <component-name>
 
 Components land in `components/ui/`. Import via `@/components/ui/<name>`.
 
+**RULE: Always use shadcn/ui components** for any UI element that has a shadcn equivalent (buttons, inputs, dialogs, cards, selects, badges, etc.). Never build these primitives from scratch with raw HTML + Tailwind when a shadcn component exists. Install the component first if it isn't already present in `components/ui/`.
+
 ## Project Goal
 
 Production-grade workout planner — **Garmin meets military logbook**. Dense, utilitarian, zero decoration. Targets serious athletes, not beginners.
