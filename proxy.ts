@@ -1,14 +1,8 @@
-import { auth } from "@/auth"
-import { NextResponse } from "next/server"
+import NextAuth from "next-auth"
+import { authConfig } from "@/auth.config"
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth
-  const isProtected = req.nextUrl.pathname.startsWith("/dashboard")
-
-  if (isProtected && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/sign-in", req.nextUrl))
-  }
-})
+export const { auth: middleware } = NextAuth(authConfig)
+export default middleware
 
 export const config = {
   matcher: ["/((?!_next|api/auth|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)"],
