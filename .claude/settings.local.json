@@ -14,7 +14,8 @@
       "Bash(ls /c/Users/hugos/Documents/GitHub/Musculation-planner/*.ts)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(cat /c/Users/hugos/Documents/GitHub/Musculation-planner/app/sign-in/[[...sign-in]]/page.tsx)"
     ]
   }
 }
