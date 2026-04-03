@@ -41,8 +41,8 @@ export default function SignInPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#444]">Journal d&apos;entraînement</p>
-          <p className="mt-1 text-2xl font-black tracking-tight" style={{ color: LIME }}>LOGBOOK</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#444]">Journal de guerrier</p>
+          <p className="mt-1 text-2xl font-black tracking-tight" style={{ color: LIME }}>GUERRIER</p>
         </div>
 
         <div style={{ border: `1px solid ${BORDER}`, backgroundColor: "#111" }}>

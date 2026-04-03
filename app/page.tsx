@@ -42,9 +42,9 @@ export default function LandingPage() {
         style={{ borderBottom: `1px solid ${BORDER}` }}
       >
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#444]">Journal</p>
+          <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#444]">Journal d&apos;entraînement</p>
           <p className="text-lg font-black leading-none tracking-tight" style={{ color: LIME }}>
-            LOGBOOK
+            GUERRIER
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -92,7 +92,7 @@ export default function LandingPage() {
             style={{ boxShadow: `0 0 32px rgba(184,255,0,0.2)` }}
           >
             <Link href={isSignedIn ? "/dashboard" : "/sign-up"}>
-              {isSignedIn ? "Continuer l'entraînement →" : "Créer mon logbook gratuitement →"}
+              {isSignedIn ? "Continuer l'entraînement →" : "Créer mon journal d\u2019entraînement gratuitement →"}
             </Link>
           </Button>
           {!isSignedIn && (
@@ -148,7 +148,7 @@ export default function LandingPage() {
 
       {/* Social proof / Stats */}
       <section className="px-5 py-8" style={{ borderBottom: `1px solid ${BORDER}` }}>
-        <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#333] mb-6">Pourquoi Logbook</p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#333] mb-6">Pourquoi Guerrier</p>
         <div className="grid grid-cols-2 gap-px" style={{ border: `1px solid ${BORDER}` }}>
           {[
             { val: "65+", label: "Exercices inclus" },
@@ -191,7 +191,7 @@ export default function LandingPage() {
         style={{ borderTop: `1px solid ${BORDER}` }}
       >
         <p className="font-mono text-[9px] text-[#333] text-center uppercase tracking-widest">
-          Logbook · Données stockées localement · Aucun serveur
+          Guerrier · Données stockées localement · Aucun serveur
         </p>
       </footer>
     </div>
