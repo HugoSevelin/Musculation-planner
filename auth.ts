@@ -5,8 +5,9 @@ import { authConfig } from "./auth.config"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   providers: [
-    Google,
+    Google({ checks: ["state"] }),
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
