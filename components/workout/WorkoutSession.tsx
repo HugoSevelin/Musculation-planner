@@ -26,14 +26,16 @@ interface WorkoutSessionProps {
   day: ProgramDay
   onFinish: () => void
   onCancel: () => void
+  onGoToHistory?: () => void
 }
 
-export function WorkoutSession({ day, onFinish, onCancel }: WorkoutSessionProps) {
+export function WorkoutSession({ day, onFinish, onCancel, onGoToHistory }: WorkoutSessionProps) {
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [liveExercises, setLiveExercises] = useState<LiveExercise[]>([])
   const [startedAt] = useState(() => Date.now())
   const [elapsed, setElapsed] = useState(0)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [doneSession, setDoneSession] = useState<Session | null>(null)
 
   useEffect(() => {
     const exLibrary = storage.exercises.get()
@@ -97,11 +99,12 @@ export function WorkoutSession({ day, onFinish, onCancel }: WorkoutSessionProps)
 
   function finishSession() {
     const sessions = storage.sessions.get()
-    const session: Session = {
+    const now = Date.now()
+    const savedSession: Session = {
       id: Math.random().toString(36).slice(2),
       date: new Date().toISOString().split("T")[0],
       startedAt,
-      finishedAt: Date.now(),
+      finishedAt: now,
       exercises: liveExercises.map((ex) => ({
         exerciseId: ex.exerciseId,
         sets: ex.sets.filter((s) => s.completed).map((s): WorkoutSet => ({
@@ -111,14 +114,89 @@ export function WorkoutSession({ day, onFinish, onCancel }: WorkoutSessionProps)
         })),
       })),
     }
-    storage.sessions.set([...sessions, session])
-    onFinish()
+    storage.sessions.set([...sessions, savedSession])
+    setDoneSession(savedSession)
   }
 
   const allSets = liveExercises.flatMap((ex) => ex.sets)
   const completedSets = allSets.filter((s) => s.completed).length
   const totalSets = allSets.length
   const progress = totalSets > 0 ? completedSets / totalSets : 0
+
+  if (doneSession) {
+    const durationMs = (doneSession.finishedAt ?? Date.now()) - doneSession.startedAt
+    const totalSetsCompleted = doneSession.exercises.reduce((acc, ex) => acc + ex.sets.length, 0)
+    const totalVolume = doneSession.exercises.reduce((acc, ex) =>
+      acc + ex.sets.reduce((s, set) =>
+        s + (set.weight && set.reps ? set.weight * set.reps : 0), 0), 0)
+    return (
+      <div className="flex min-h-svh flex-col items-center justify-center bg-[#0d0d0d] px-6">
+        {/* Titre */}
+        <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#444]">Séance terminée</p>
+        <p className="mt-2 text-5xl font-black tracking-tight" style={{ color: LIME }}>
+          {formatElapsed(durationMs)}
+        </p>
+        <p className="mt-1 font-mono text-xs text-[#555]">durée totale</p>
+
+        {/* Stats */}
+        <div className="mt-8 w-full" style={{ border: `1px solid ${BORDER}` }}>
+          <div className="grid grid-cols-2" style={{ borderBottom: `1px solid ${BORDER}` }}>
+            <div className="px-5 py-4" style={{ borderRight: `1px solid ${BORDER}` }}>
+              <p className="font-mono text-2xl font-black text-[#efefef]">{totalSetsCompleted}</p>
+              <p className="mt-0.5 text-[10px] uppercase tracking-widest text-[#444]">Séries</p>
+            </div>
+            <div className="px-5 py-4">
+              <p className="font-mono text-2xl font-black text-[#efefef]">
+                {totalVolume > 0 ? `${totalVolume.toLocaleString("fr-FR")}` : "—"}
+              </p>
+              <p className="mt-0.5 text-[10px] uppercase tracking-widest text-[#444]">
+                {totalVolume > 0 ? "kg total" : "Cardio / BW"}
+              </p>
+            </div>
+          </div>
+
+          {/* Récap par exercice */}
+          {doneSession.exercises.filter((ex) => ex.sets.length > 0).map((ex, i) => {
+            const exercise = exercises.find((e) => e.id === ex.exerciseId)
+            const isLast = i === doneSession.exercises.filter((e) => e.sets.length > 0).length - 1
+            const maxWeight = Math.max(...ex.sets.map((s) => s.weight ?? 0))
+            const totalReps = ex.sets.reduce((acc, s) => acc + (s.reps ?? 0), 0)
+            return (
+              <div
+                key={ex.exerciseId}
+                className="flex items-center justify-between px-5 py-3"
+                style={{ borderBottom: isLast ? "none" : `1px solid rgba(255,255,255,0.04)` }}
+              >
+                <span className="text-sm text-[#efefef]">{exercise?.name ?? "?"}</span>
+                <span className="font-mono text-xs" style={{ color: LIME }}>
+                  {ex.sets.length} série{ex.sets.length > 1 ? "s" : ""}
+                  {maxWeight > 0 ? ` · ${maxWeight}kg` : ""}
+                  {totalReps > 0 && maxWeight === 0 ? ` · ${totalReps} reps` : ""}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Bouton retour */}
+        <button
+          onClick={onFinish}
+          className="mt-6 flex w-full items-center justify-center py-4 text-sm font-black uppercase tracking-widest transition-opacity hover:opacity-80"
+          style={{ backgroundColor: LIME, color: "#0d0d0d" }}
+        >
+          Retour à l&apos;accueil
+        </button>
+        {onGoToHistory && (
+          <button
+            onClick={() => { onFinish(); onGoToHistory() }}
+            className="mt-3 text-[11px] uppercase tracking-widest text-[#444] hover:text-[#efefef] transition-colors"
+          >
+            Voir l&apos;historique →
+          </button>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-svh flex-col bg-[#0d0d0d]">

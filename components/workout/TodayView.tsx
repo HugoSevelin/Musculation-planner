@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { storage } from "@/lib/storage"
 import type { Program, ProgramDay } from "@/lib/types"
-import { WorkoutSession } from "./WorkoutSession"
 
 const DAY_NAMES_FR = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
 const JS_TO_PROGRAM_INDEX = [6, 0, 1, 2, 3, 4, 5]
@@ -12,11 +11,11 @@ const BORDER = "rgba(255,255,255,0.07)"
 
 interface TodayViewProps {
   onGoToProgram: () => void
+  onStartSession: (day: ProgramDay) => void
 }
 
-export function TodayView({ onGoToProgram }: TodayViewProps) {
+export function TodayView({ onGoToProgram, onStartSession }: TodayViewProps) {
   const [programs, setPrograms] = useState<Program[]>([])
-  const [sessionDay, setSessionDay] = useState<ProgramDay | null>(null)
 
   useEffect(() => {
     setPrograms(storage.programs.get())
@@ -28,16 +27,6 @@ export function TodayView({ onGoToProgram }: TodayViewProps) {
   const programDayIndex = JS_TO_PROGRAM_INDEX[today.getDay()]
   const activeProgram = programs[0] ?? null
   const todayDay = activeProgram?.days[programDayIndex] ?? null
-
-  if (sessionDay) {
-    return (
-      <WorkoutSession
-        day={sessionDay}
-        onFinish={() => setSessionDay(null)}
-        onCancel={() => setSessionDay(null)}
-      />
-    )
-  }
 
   const exercises = storage.exercises.get()
 
@@ -135,7 +124,7 @@ export function TodayView({ onGoToProgram }: TodayViewProps) {
 
           {/* CTA */}
           <button
-            onClick={() => setSessionDay(todayDay)}
+            onClick={() => onStartSession(todayDay)}
             className="flex w-full items-center justify-between px-5 py-4 text-sm font-bold uppercase tracking-widest transition-opacity hover:opacity-80"
             style={{
               backgroundColor: LIME,
