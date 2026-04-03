@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(powershell -Command \"Get-Command npm -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\")",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Read(//c/Users/hugos/Documents/GitHub/Musculation-planner/$USERPROFILE/Documents/GitHub/**)",
+      "Bash(bun run:*)"
     ]
   }
 }
