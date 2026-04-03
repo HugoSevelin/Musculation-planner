@@ -9,7 +9,12 @@
       "Bash(bun add:*)",
       "Bash(bun remove:*)",
       "Bash(Start-Sleep -Seconds 10)",
-      "Bash(python3 -c \"import sys,json; logs=json.load\\(sys.stdin\\); errors=[l for l in logs if ''''error'''' in l.get\\(''''text'''',''''''''\\).lower\\(\\) or ''''Error'''' in l.get\\(''''text'''',''''''''\\)]; print\\(''''\\\\n''''.join\\(l[''''text''''][:300] for l in errors[:10]\\)\\)\")"
+      "Bash(python3 -c \"import sys,json; logs=json.load\\(sys.stdin\\); errors=[l for l in logs if ''''error'''' in l.get\\(''''text'''',''''''''\\).lower\\(\\) or ''''Error'''' in l.get\\(''''text'''',''''''''\\)]; print\\(''''\\\\n''''.join\\(l[''''text''''][:300] for l in errors[:10]\\)\\)\")",
+      "Bash(cat /c/Users/hugos/Documents/GitHub/Musculation-planner/app/api/auth/[...nextauth]/route.ts)",
+      "Bash(ls /c/Users/hugos/Documents/GitHub/Musculation-planner/*.ts)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
