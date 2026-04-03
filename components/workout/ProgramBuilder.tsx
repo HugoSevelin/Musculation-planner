@@ -11,23 +11,22 @@ import { ExercisePicker } from "./ExercisePicker"
 const DAY_NAMES = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
 const DAY_SHORT = ["LUN", "MAR", "MER", "JEU", "VEN", "SAM", "DIM"]
 const LIME = "#b8ff00"
+const CYAN = "#00e5ff"
+const RED = "#ff3333"
+const BORDER = "rgba(255,255,255,0.07)"
+const SURFACE = "#161616"
 
-function makeId() {
-  return Math.random().toString(36).slice(2)
-}
+function makeId() { return Math.random().toString(36).slice(2) }
 
 function makeDefaultProgram(name: string): Program {
   return {
-    id: makeId(),
-    name,
+    id: makeId(), name,
     days: DAY_NAMES.map((dayName, i) => ({
-      id: makeId(),
-      name: dayName,
+      id: makeId(), name: dayName,
       type: i >= 5 ? "rest" : "workout",
       exercises: [],
     })),
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
+    createdAt: Date.now(), updatedAt: Date.now(),
   }
 }
 
@@ -36,110 +35,127 @@ type View =
   | { type: "week"; programId: string }
   | { type: "day"; programId: string; dayIndex: number }
 
-function formatTarget(ex: ProgramExercise, exercise: Exercise): string {
-  if (exercise.type === "strength" || exercise.type === "bodyweight") {
-    const parts = []
-    if (ex.sets) parts.push(`${ex.sets}×${ex.reps ?? "?"}`)
-    if (ex.weight) parts.push(`${ex.weight}kg`)
-    return parts.join(" — ") || "—"
-  }
-  if (exercise.type === "cardio" || exercise.type === "sport") {
-    const parts = []
-    if (ex.duration) parts.push(`${Math.round(ex.duration / 60)}min`)
-    if (ex.distance) parts.push(`${ex.distance}m`)
-    return parts.join(" / ") || "—"
-  }
-  return "—"
+// ── Onboarding ────────────────────────────────────────────────────────────────
+
+function Onboarding({ onCreate }: { onCreate: () => void }) {
+  return (
+    <div className="flex flex-col px-5 pt-8 pb-6">
+      {/* Title */}
+      <div className="mb-8">
+        <p className="text-[10px] uppercase tracking-[0.25em] text-[#444]">Journal d'entraînement</p>
+        <p className="mt-2 text-3xl font-black leading-tight text-[#efefef]">
+          Planifie ta<br />semaine.
+        </p>
+      </div>
+
+      {/* Steps */}
+      <div className="mb-8 flex flex-col gap-px" style={{ border: `1px solid ${BORDER}` }}>
+        {[
+          {
+            num: "01",
+            title: "Nomme ton programme",
+            desc: "PPL, Full Body, Upper/Lower...",
+            color: LIME,
+          },
+          {
+            num: "02",
+            title: "Configure ta semaine",
+            desc: "Active les jours d'entraînement, passe les autres en Repos",
+            color: CYAN,
+          },
+          {
+            num: "03",
+            title: "Ajoute tes exercices",
+            desc: "65 exercices · muscu, cardio, natation, sport de combat...",
+            color: "#ff7700",
+          },
+        ].map((step, i) => (
+          <div
+            key={step.num}
+            className="flex items-start gap-4 px-4 py-4"
+            style={{
+              backgroundColor: SURFACE,
+              borderBottom: i < 2 ? `1px solid ${BORDER}` : "none",
+            }}
+          >
+            <span className="font-mono text-xs font-bold pt-0.5" style={{ color: step.color }}>
+              {step.num}
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-[#efefef]">{step.title}</p>
+              <p className="mt-0.5 text-xs text-[#555]">{step.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* CTA */}
+      <button
+        onClick={onCreate}
+        className="flex w-full items-center justify-between px-5 py-4 text-sm font-bold uppercase tracking-widest transition-opacity hover:opacity-80"
+        style={{ backgroundColor: LIME, color: "#0d0d0d", boxShadow: `0 0 24px rgba(184,255,0,0.25)` }}
+      >
+        Créer mon programme
+        <span>→</span>
+      </button>
+
+      <p className="mt-4 text-center text-[10px] text-[#333]">Données stockées localement · aucun compte requis</p>
+    </div>
+  )
 }
 
+// ── Param editor ──────────────────────────────────────────────────────────────
+
 function ExerciseParamEditor({
-  progEx,
-  exercise,
-  onChange,
+  progEx, exercise, onChange,
 }: {
-  progEx: ProgramExercise
-  exercise: Exercise
-  onChange: (updated: Partial<ProgramExercise>) => void
+  progEx: ProgramExercise; exercise: Exercise; onChange: (p: Partial<ProgramExercise>) => void
 }) {
   const inputCls =
-    "w-14 border-b border-black/20 bg-transparent text-center font-mono text-sm text-[#111] focus:border-[#b8ff00] focus:outline-none"
+    "w-14 border-b border-white/15 bg-transparent text-center font-mono text-sm text-[#efefef] focus:border-[#b8ff00] focus:outline-none"
 
   if (exercise.type === "strength" || exercise.type === "bodyweight") {
     return (
-      <div className="flex items-center gap-2 text-[#bbb]">
-        <input
-          type="number"
-          min={1}
-          value={progEx.sets ?? ""}
-          onChange={(e) => onChange({ sets: Number(e.target.value) || undefined })}
-          className={inputCls}
-          placeholder="Sér"
-        />
-        <span className="text-xs">×</span>
-        <input
-          type="number"
-          min={1}
-          value={progEx.reps ?? ""}
-          onChange={(e) => onChange({ reps: Number(e.target.value) || undefined })}
-          className={inputCls}
-          placeholder="Rép"
-        />
+      <div className="flex items-center gap-3 text-[#444]">
+        <div className="flex items-center gap-1">
+          <input type="number" min={1} value={progEx.sets ?? ""} onChange={(e) => onChange({ sets: Number(e.target.value) || undefined })} className={inputCls} placeholder="S" />
+          <span className="text-xs text-[#333]">×</span>
+          <input type="number" min={1} value={progEx.reps ?? ""} onChange={(e) => onChange({ reps: Number(e.target.value) || undefined })} className={inputCls} placeholder="R" />
+        </div>
         {exercise.type === "strength" && (
-          <>
-            <span className="text-xs">—</span>
-            <input
-              type="number"
-              min={0}
-              step={2.5}
-              value={progEx.weight ?? ""}
-              onChange={(e) => onChange({ weight: Number(e.target.value) || undefined })}
-              className={inputCls}
-              placeholder="kg"
-            />
-            <span className="text-[10px] text-[#999]">kg</span>
-          </>
+          <div className="flex items-center gap-1">
+            <input type="number" min={0} step={2.5} value={progEx.weight ?? ""} onChange={(e) => onChange({ weight: Number(e.target.value) || undefined })} className={inputCls} placeholder="kg" />
+            <span className="text-[10px] text-[#444]">kg</span>
+          </div>
         )}
       </div>
     )
   }
-
   return (
-    <div className="flex items-center gap-2 text-[#bbb]">
-      <input
-        type="number"
-        min={1}
-        value={progEx.duration ? Math.round(progEx.duration / 60) : ""}
-        onChange={(e) => onChange({ duration: Number(e.target.value) * 60 || undefined })}
-        className={inputCls}
-        placeholder="min"
-      />
-      <span className="text-[10px] text-[#999]">min</span>
+    <div className="flex items-center gap-2">
+      <input type="number" min={1} value={progEx.duration ? Math.round(progEx.duration / 60) : ""} onChange={(e) => onChange({ duration: Number(e.target.value) * 60 || undefined })} className={inputCls} placeholder="min" />
+      <span className="text-[10px] text-[#444]">min</span>
       {exercise.type === "cardio" && (
         <>
-          <span className="text-xs">/</span>
-          <input
-            type="number"
-            min={0}
-            value={progEx.distance ?? ""}
-            onChange={(e) => onChange({ distance: Number(e.target.value) || undefined })}
-            className={inputCls}
-            placeholder="m"
-          />
-          <span className="text-[10px] text-[#999]">m</span>
+          <input type="number" min={0} value={progEx.distance ?? ""} onChange={(e) => onChange({ distance: Number(e.target.value) || undefined })} className={inputCls} placeholder="m" />
+          <span className="text-[10px] text-[#444]">m</span>
         </>
       )}
     </div>
   )
 }
 
+// ── Main ──────────────────────────────────────────────────────────────────────
+
 export function ProgramBuilder() {
   const [programs, setPrograms] = useState<Program[]>([])
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [view, setView] = useState<View>({ type: "programs" })
   const [showPicker, setShowPicker] = useState(false)
-  const [editingName, setEditingName] = useState<string | null>(null)
-  const [newProgramName, setNewProgramName] = useState("")
   const [creatingProgram, setCreatingProgram] = useState(false)
+  const [newProgramName, setNewProgramName] = useState("")
+  const [editingName, setEditingName] = useState<string | null>(null)
+  const [showWeekTip, setShowWeekTip] = useState(false)
 
   useEffect(() => {
     setPrograms(storage.programs.get())
@@ -151,18 +167,20 @@ export function ProgramBuilder() {
     storage.programs.set(updated)
   }
 
-  function createProgram() {
-    if (!newProgramName.trim()) return
-    const p = makeDefaultProgram(newProgramName.trim())
+  function createProgram(name?: string) {
+    const n = (name ?? newProgramName).trim()
+    if (!n) return
+    const p = makeDefaultProgram(n)
     save([...programs, p])
     setNewProgramName("")
     setCreatingProgram(false)
+    setShowWeekTip(true)
     setView({ type: "week", programId: p.id })
   }
 
   function deleteProgram(id: string) {
     save(programs.filter((p) => p.id !== id))
-    if (view.type !== "programs") setView({ type: "programs" })
+    setView({ type: "programs" })
   }
 
   function renameProgram(id: string, name: string) {
@@ -171,107 +189,104 @@ export function ProgramBuilder() {
   }
 
   function updateDay(programId: string, dayIndex: number, patch: Partial<ProgramDay>) {
-    save(
-      programs.map((p) => {
-        if (p.id !== programId) return p
-        const days = p.days.map((d, i) => (i === dayIndex ? { ...d, ...patch } : d))
-        return { ...p, days, updatedAt: Date.now() }
-      }),
-    )
+    save(programs.map((p) => {
+      if (p.id !== programId) return p
+      const days = p.days.map((d, i) => (i === dayIndex ? { ...d, ...patch } : d))
+      return { ...p, days, updatedAt: Date.now() }
+    }))
   }
 
   function toggleDayType(programId: string, dayIndex: number) {
-    const program = programs.find((p) => p.id === programId)!
-    const day = program.days[dayIndex]
-    updateDay(programId, dayIndex, {
-      type: day.type === "rest" ? "workout" : "rest",
-      exercises: [],
-    })
+    const day = programs.find((p) => p.id === programId)!.days[dayIndex]
+    updateDay(programId, dayIndex, { type: day.type === "rest" ? "workout" : "rest", exercises: [] })
   }
 
   function addExercise(programId: string, dayIndex: number, exercise: Exercise) {
-    const program = programs.find((p) => p.id === programId)!
-    const day = program.days[dayIndex]
+    const day = programs.find((p) => p.id === programId)!.days[dayIndex]
     const newEx: ProgramExercise = { exerciseId: exercise.id }
-    if (exercise.type === "strength") {
-      newEx.sets = 3; newEx.reps = 8
-    } else if (exercise.type === "bodyweight") {
-      newEx.sets = 3; newEx.reps = 10
-    } else {
-      newEx.duration = 30 * 60
-    }
+    if (exercise.type === "strength") { newEx.sets = 3; newEx.reps = 8 }
+    else if (exercise.type === "bodyweight") { newEx.sets = 3; newEx.reps = 10 }
+    else { newEx.duration = 30 * 60 }
     updateDay(programId, dayIndex, { exercises: [...day.exercises, newEx] })
     setShowPicker(false)
   }
 
   function removeExercise(programId: string, dayIndex: number, exIndex: number) {
-    const program = programs.find((p) => p.id === programId)!
-    const day = program.days[dayIndex]
-    updateDay(programId, dayIndex, {
-      exercises: day.exercises.filter((_, i) => i !== exIndex),
-    })
+    const day = programs.find((p) => p.id === programId)!.days[dayIndex]
+    updateDay(programId, dayIndex, { exercises: day.exercises.filter((_, i) => i !== exIndex) })
   }
 
   function updateExercise(programId: string, dayIndex: number, exIndex: number, patch: Partial<ProgramExercise>) {
-    const program = programs.find((p) => p.id === programId)!
-    const day = program.days[dayIndex]
-    const updated = day.exercises.map((ex, i) => (i === exIndex ? { ...ex, ...patch } : ex))
-    updateDay(programId, dayIndex, { exercises: updated })
+    const day = programs.find((p) => p.id === programId)!.days[dayIndex]
+    updateDay(programId, dayIndex, { exercises: day.exercises.map((ex, i) => i === exIndex ? { ...ex, ...patch } : ex) })
   }
 
-  function getProgram(id: string) {
-    return programs.find((p) => p.id === id)
-  }
-
-  function getExercise(id: string) {
-    return exercises.find((e) => e.id === id)
-  }
+  const getProgram = (id: string) => programs.find((p) => p.id === id)
+  const getExercise = (id: string) => exercises.find((e) => e.id === id)
 
   // ── Programs list ─────────────────────────────────────────────────────────
 
   if (view.type === "programs") {
+    const isEmpty = programs.length === 0 && !creatingProgram
+
     return (
       <div className="flex flex-col">
-        <div className="flex items-center justify-between border-b border-black/10 px-4 py-4">
-          <h1 className="text-xs uppercase tracking-[0.2em] text-[#111]">Programmes</h1>
-          <button onClick={() => setCreatingProgram(true)} className="transition-opacity hover:opacity-60">
-            <HugeiconsIcon icon={Add01Icon} size={20} color="#111" />
-          </button>
-        </div>
+        {/* Header (only when there are programs) */}
+        {!isEmpty && (
+          <div className="flex items-center justify-between px-4 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[#efefef]">Planning</p>
+            <button onClick={() => setCreatingProgram(true)} className="transition-opacity hover:opacity-60">
+              <HugeiconsIcon icon={Add01Icon} size={22} color="#efefef" />
+            </button>
+          </div>
+        )}
 
+        {/* Empty state / Onboarding */}
+        {isEmpty && <Onboarding onCreate={() => setCreatingProgram(true)} />}
+
+        {/* Create form */}
         {creatingProgram && (
-          <div className="flex items-center gap-3 border-b border-black/10 bg-[#f0f0ee] px-4 py-3">
+          <div className="mx-4 mt-4" style={{ border: `1px solid ${LIME}`, backgroundColor: SURFACE }}>
+            <div className="px-4 pt-3 pb-2">
+              <p className="text-[10px] uppercase tracking-widest text-[#444]">Nouveau programme</p>
+            </div>
             <input
               autoFocus
               type="text"
-              placeholder="Nom du programme..."
+              placeholder="Ex: PPL, Full Body, Ma routine..."
               value={newProgramName}
               onChange={(e) => setNewProgramName(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") createProgram()
                 if (e.key === "Escape") { setCreatingProgram(false); setNewProgramName("") }
               }}
-              className="flex-1 bg-transparent text-sm text-[#111] placeholder-[#bbb] focus:outline-none"
+              className="w-full bg-transparent px-4 py-3 text-base text-[#efefef] placeholder-[#444] focus:outline-none"
             />
-            <button onClick={createProgram} className="text-[10px] font-bold uppercase tracking-widest px-3 py-1" style={{ backgroundColor: LIME, color: "#111" }}>
-              Créer
-            </button>
-            <button onClick={() => { setCreatingProgram(false); setNewProgramName("") }} className="text-[10px] uppercase tracking-widest text-[#999]">
-              Annuler
-            </button>
+            <div className="flex" style={{ borderTop: `1px solid ${BORDER}` }}>
+              <button
+                onClick={() => createProgram()}
+                disabled={!newProgramName.trim()}
+                className="flex-1 py-3 text-xs font-bold uppercase tracking-widest disabled:opacity-30 transition-opacity hover:opacity-80"
+                style={{ backgroundColor: LIME, color: "#0d0d0d" }}
+              >
+                Créer →
+              </button>
+              <button
+                onClick={() => { setCreatingProgram(false); setNewProgramName("") }}
+                className="px-5 py-3 text-xs uppercase tracking-widest text-[#444] hover:text-[#efefef] transition-colors"
+                style={{ borderLeft: `1px solid ${BORDER}` }}
+              >
+                Annuler
+              </button>
+            </div>
           </div>
         )}
 
-        {programs.length === 0 && !creatingProgram && (
-          <p className="px-4 py-12 text-center text-sm text-[#bbb]">
-            Aucun programme.<br />Crée ton premier programme.
-          </p>
-        )}
-
+        {/* Program list */}
         {programs.map((program) => (
-          <div key={program.id} className="border-b border-black/10">
+          <div key={program.id} style={{ borderBottom: `1px solid ${BORDER}` }}>
             {editingName === program.id ? (
-              <div className="flex items-center gap-3 bg-[#f0f0ee] px-4 py-3">
+              <div className="flex items-center gap-3 px-4 py-4" style={{ backgroundColor: SURFACE }}>
                 <input
                   autoFocus
                   type="text"
@@ -281,29 +296,37 @@ export function ProgramBuilder() {
                     if (e.key === "Enter") renameProgram(program.id, (e.target as HTMLInputElement).value || program.name)
                     if (e.key === "Escape") setEditingName(null)
                   }}
-                  className="flex-1 bg-transparent text-sm text-[#111] focus:outline-none"
+                  className="flex-1 bg-transparent text-base text-[#efefef] focus:outline-none"
                 />
               </div>
             ) : (
-              <div className="flex items-center">
+              <div className="flex items-stretch">
                 <button
-                  className="flex flex-1 items-center justify-between px-4 py-4 text-left transition-colors hover:bg-black/5"
+                  className="flex flex-1 items-center justify-between px-4 py-4 text-left transition-colors hover:bg-white/5 active:bg-white/10"
                   onClick={() => setView({ type: "week", programId: program.id })}
                 >
                   <div>
-                    <p className="text-sm font-medium text-[#111]">{program.name}</p>
-                    <p className="mt-0.5 font-mono text-[10px] text-[#999]">
-                      {program.days.filter((d) => d.type === "workout").length}j / sem
-                    </p>
+                    <p className="text-base font-semibold text-[#efefef]">{program.name}</p>
+                    <div className="mt-1 flex items-center gap-3">
+                      <span className="font-mono text-[11px] text-[#555]">
+                        {program.days.filter((d) => d.type === "workout").length}j entraînement
+                      </span>
+                      <span className="font-mono text-[11px] text-[#333]">·</span>
+                      <span className="font-mono text-[11px] text-[#555]">
+                        {program.days.reduce((acc, d) => acc + d.exercises.length, 0)} exercices
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-[#bbb]">→</span>
+                  <span className="ml-4 text-lg text-[#333]">›</span>
                 </button>
-                <button onClick={() => setEditingName(program.id)} className="px-3 py-4 text-[#bbb] hover:text-[#111] transition-colors">
-                  <HugeiconsIcon icon={PencilEdit01Icon} size={16} color="currentColor" />
-                </button>
-                <button onClick={() => deleteProgram(program.id)} className="px-3 py-4 text-[#bbb] hover:text-[#ff3300] transition-colors">
-                  <HugeiconsIcon icon={Delete01Icon} size={16} color="currentColor" />
-                </button>
+                <div className="flex items-center" style={{ borderLeft: `1px solid ${BORDER}` }}>
+                  <button onClick={() => setEditingName(program.id)} className="px-3 py-4 text-[#444] hover:text-[#efefef] transition-colors">
+                    <HugeiconsIcon icon={PencilEdit01Icon} size={16} color="currentColor" />
+                  </button>
+                  <button onClick={() => deleteProgram(program.id)} className="px-3 py-4 text-[#444] hover:text-[#ff3333] transition-colors" style={{ borderLeft: `1px solid ${BORDER}` }}>
+                    <HugeiconsIcon icon={Delete01Icon} size={16} color="currentColor" />
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -320,54 +343,94 @@ export function ProgramBuilder() {
 
     return (
       <div className="flex flex-col">
-        <div className="flex items-center gap-3 border-b border-black/10 px-4 py-4">
-          <button onClick={() => setView({ type: "programs" })} className="text-[#bbb] hover:text-[#111] transition-colors">
-            <HugeiconsIcon icon={ArrowLeft01Icon} size={20} color="currentColor" />
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
+          <button onClick={() => setView({ type: "programs" })} className="text-[#444] hover:text-[#efefef] transition-colors">
+            <HugeiconsIcon icon={ArrowLeft01Icon} size={22} color="currentColor" />
           </button>
-          <h1 className="flex-1 text-sm font-medium text-[#111]">{program.name}</h1>
+          <p className="flex-1 text-base font-semibold text-[#efefef]">{program.name}</p>
         </div>
 
-        {program.days.map((day, i) => {
-          const isRest = day.type === "rest"
-          return (
-            <div key={day.id} className="border-b border-black/10">
-              <div className="flex items-center">
-                <button
-                  onClick={() => !isRest && setView({ type: "day", programId: program.id, dayIndex: i })}
-                  className="flex flex-1 items-start gap-4 px-4 py-4 text-left transition-colors hover:bg-black/5"
-                  disabled={isRest}
-                >
-                  <span className="w-8 shrink-0 font-mono text-[10px] text-[#bbb] pt-0.5">
+        {/* Tip banner */}
+        {showWeekTip && (
+          <div className="mx-4 mt-4 flex items-start gap-3 px-4 py-3" style={{ backgroundColor: "rgba(184,255,0,0.07)", border: `1px solid rgba(184,255,0,0.2)` }}>
+            <span className="text-sm" style={{ color: LIME }}>👆</span>
+            <div className="flex-1">
+              <p className="text-xs text-[#efefef]">Appuie sur un jour actif pour ajouter tes exercices</p>
+              <p className="mt-0.5 text-[10px] text-[#555]">Tu peux renommer chaque jour (Push, Pull, Jambes...)</p>
+            </div>
+            <button onClick={() => setShowWeekTip(false)} className="text-[#444] text-xs hover:text-[#efefef]">✕</button>
+          </div>
+        )}
+
+        {/* Days */}
+        <div className="flex flex-col mt-3">
+          {program.days.map((day, i) => {
+            const isRest = day.type === "rest"
+            const exCount = day.exercises.length
+            const preview = day.exercises.slice(0, 2).map((ex) => getExercise(ex.exerciseId)?.name ?? "?")
+
+            return (
+              <div
+                key={day.id}
+                className="flex items-stretch"
+                style={{
+                  borderBottom: `1px solid ${BORDER}`,
+                  opacity: isRest ? 0.5 : 1,
+                }}
+              >
+                {/* Left: day short */}
+                <div className="flex w-14 flex-col items-center justify-center py-4 shrink-0" style={{ borderRight: `1px solid ${BORDER}` }}>
+                  <span className="font-mono text-[10px] font-bold" style={{ color: isRest ? "#444" : LIME }}>
                     {DAY_SHORT[i]}
                   </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm" style={{ color: isRest ? "#bbb" : "#111" }}>
-                      {day.name}
-                    </p>
-                    {!isRest && day.exercises.length > 0 && (
-                      <p className="mt-0.5 truncate text-[11px] text-[#999]">
-                        {day.exercises.slice(0, 3).map((ex) => getExercise(ex.exerciseId)?.name ?? "?").join(" · ")}
-                        {day.exercises.length > 3 && ` +${day.exercises.length - 3}`}
+                </div>
+
+                {/* Center: clickable content */}
+                <button
+                  className="flex flex-1 items-center justify-between px-4 py-4 text-left transition-colors hover:bg-white/5 active:bg-white/10"
+                  onClick={() => !isRest && setView({ type: "day", programId: program.id, dayIndex: i })}
+                  disabled={isRest}
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-[#efefef]">{day.name}</p>
+                    {!isRest && exCount === 0 && (
+                      <p className="mt-0.5 text-[11px] text-[#444]">Appuie pour ajouter des exercices</p>
+                    )}
+                    {!isRest && exCount > 0 && (
+                      <p className="mt-0.5 truncate text-[11px] text-[#555]">
+                        {preview.join(" · ")}{exCount > 2 ? ` +${exCount - 2}` : ""}
                       </p>
                     )}
-                    {!isRest && day.exercises.length === 0 && (
-                      <p className="mt-0.5 text-[11px] text-[#bbb]">Aucun exercice</p>
-                    )}
                   </div>
-                  {!isRest && <span className="text-[#bbb]">→</span>}
+                  {!isRest && (
+                    <span className="ml-3 text-[#444] shrink-0">›</span>
+                  )}
                 </button>
 
+                {/* Right: toggle */}
                 <button
                   onClick={() => toggleDayType(program.id, i)}
-                  className="px-4 py-4 text-[10px] font-semibold uppercase tracking-widest transition-colors"
-                  style={{ color: isRest ? "#ff3300" : "#bbb" }}
+                  className="shrink-0 px-3 py-4 text-[9px] font-bold uppercase tracking-widest transition-colors"
+                  style={{
+                    borderLeft: `1px solid ${BORDER}`,
+                    color: isRest ? RED : "#333",
+                    minWidth: 52,
+                  }}
                 >
                   {isRest ? "Repos" : "Actif"}
                 </button>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
+
+        {/* Bottom tip */}
+        <div className="px-4 py-3 mt-2">
+          <p className="text-[10px] text-[#333] text-center">
+            Appuie sur <span style={{ color: RED }}>Repos</span> / <span className="text-[#333]">Actif</span> pour changer le type du jour
+          </p>
+        </div>
       </div>
     )
   }
@@ -381,53 +444,67 @@ export function ProgramBuilder() {
 
     return (
       <div className="flex flex-col">
-        <div className="flex items-center gap-3 border-b border-black/10 px-4 py-4">
-          <button onClick={() => setView({ type: "week", programId: view.programId })} className="text-[#bbb] hover:text-[#111] transition-colors">
-            <HugeiconsIcon icon={ArrowLeft01Icon} size={20} color="currentColor" />
+        {/* Header */}
+        <div className="flex items-center gap-3 px-4 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
+          <button onClick={() => setView({ type: "week", programId: view.programId })} className="text-[#444] hover:text-[#efefef] transition-colors">
+            <HugeiconsIcon icon={ArrowLeft01Icon} size={22} color="currentColor" />
           </button>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <DayNameEditor
               name={day.name}
               onChange={(name) => updateDay(view.programId, view.dayIndex, { name })}
             />
-            <p className="text-[10px] uppercase tracking-wider text-[#bbb]">{DAY_NAMES[view.dayIndex]}</p>
+            <p className="text-[10px] uppercase tracking-widest text-[#444]">{DAY_NAMES[view.dayIndex]}</p>
           </div>
+          <span className="font-mono text-[10px] text-[#444]">{day.exercises.length} ex.</span>
         </div>
 
+        {/* Tip if empty */}
         {day.exercises.length === 0 && (
-          <p className="px-4 py-8 text-center text-sm text-[#bbb]">Aucun exercice. Ajoute-en un.</p>
+          <div className="mx-4 mt-4 px-4 py-3 flex items-center gap-3" style={{ backgroundColor: "rgba(0,229,255,0.06)", border: `1px solid rgba(0,229,255,0.15)` }}>
+            <span style={{ color: CYAN }}>💡</span>
+            <p className="text-xs text-[#efefef]">Ajoute des exercices depuis la bibliothèque (muscu, cardio, sport...)</p>
+          </div>
         )}
 
-        {day.exercises.map((progEx, exIndex) => {
-          const exercise = getExercise(progEx.exerciseId)
-          if (!exercise) return null
-          return (
-            <div key={exIndex} className="border-b border-black/10 px-4 py-4">
-              <div className="mb-2 flex items-start justify-between">
-                <div>
-                  <p className="text-sm font-medium text-[#111]">{exercise.name}</p>
-                  <p className="text-[10px] uppercase tracking-wider text-[#999]">
-                    {MUSCLE_GROUP_LABELS[exercise.muscleGroup]}
-                  </p>
+        {/* Exercises */}
+        <div className="flex flex-col mt-3">
+          {day.exercises.map((progEx, exIndex) => {
+            const exercise = getExercise(progEx.exerciseId)
+            if (!exercise) return null
+            return (
+              <div key={exIndex} className="px-4 py-4" style={{ borderBottom: `1px solid ${BORDER}` }}>
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <p className="text-sm font-semibold text-[#efefef]">{exercise.name}</p>
+                    <p className="mt-0.5 text-[10px] uppercase tracking-wider text-[#444]">
+                      {MUSCLE_GROUP_LABELS[exercise.muscleGroup]}
+                    </p>
+                  </div>
+                  <button onClick={() => removeExercise(view.programId, view.dayIndex, exIndex)} className="text-[#333] hover:text-[#ff3333] transition-colors ml-3">
+                    <HugeiconsIcon icon={Delete01Icon} size={18} color="currentColor" />
+                  </button>
                 </div>
-                <button onClick={() => removeExercise(view.programId, view.dayIndex, exIndex)} className="text-[#bbb] hover:text-[#ff3300] transition-colors">
-                  <HugeiconsIcon icon={Delete01Icon} size={16} color="currentColor" />
-                </button>
+                <ExerciseParamEditor
+                  progEx={progEx} exercise={exercise}
+                  onChange={(patch) => updateExercise(view.programId, view.dayIndex, exIndex, patch)}
+                />
               </div>
-              <ExerciseParamEditor
-                progEx={progEx}
-                exercise={exercise}
-                onChange={(patch) => updateExercise(view.programId, view.dayIndex, exIndex, patch)}
-              />
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
 
+        {/* Add button */}
         <button
           onClick={() => setShowPicker(true)}
-          className="mx-4 mt-6 flex items-center justify-center gap-2 border border-dashed border-black/20 py-3 text-xs uppercase tracking-widest text-[#999] transition-colors hover:border-[#111] hover:text-[#111]"
+          className="mx-4 mt-4 flex items-center justify-center gap-2 py-4 text-sm font-semibold uppercase tracking-widest transition-all hover:opacity-80"
+          style={{
+            border: `1px dashed rgba(184,255,0,0.3)`,
+            color: LIME,
+            backgroundColor: "rgba(184,255,0,0.05)",
+          }}
         >
-          <HugeiconsIcon icon={Add01Icon} size={16} color="currentColor" />
+          <HugeiconsIcon icon={Add01Icon} size={18} color={LIME} />
           Ajouter un exercice
         </button>
 
@@ -446,7 +523,9 @@ export function ProgramBuilder() {
   return null
 }
 
-function DayNameEditor({ name, onChange }: { name: string; onChange: (name: string) => void }) {
+// ── Day name editor ───────────────────────────────────────────────────────────
+
+function DayNameEditor({ name, onChange }: { name: string; onChange: (n: string) => void }) {
   const [editing, setEditing] = useState(false)
   const [value, setValue] = useState(name)
 
@@ -459,23 +538,25 @@ function DayNameEditor({ name, onChange }: { name: string; onChange: (name: stri
   if (editing) {
     return (
       <input
-        autoFocus
-        value={value}
+        autoFocus value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={commit}
         onKeyDown={(e) => {
           if (e.key === "Enter") commit()
           if (e.key === "Escape") { setValue(name); setEditing(false) }
         }}
-        className="bg-transparent text-sm font-medium text-[#111] focus:outline-none"
+        className="bg-transparent text-base font-semibold text-[#efefef] focus:outline-none w-full"
       />
     )
   }
 
   return (
-    <button onClick={() => { setValue(name); setEditing(true) }} className="flex items-center gap-1 text-sm font-medium text-[#111] hover:opacity-60 transition-opacity">
+    <button
+      onClick={() => { setValue(name); setEditing(true) }}
+      className="flex items-center gap-1.5 text-base font-semibold text-[#efefef] hover:opacity-70 transition-opacity"
+    >
       {name}
-      <HugeiconsIcon icon={PencilEdit01Icon} size={12} color="#bbb" />
+      <HugeiconsIcon icon={PencilEdit01Icon} size={12} color="#444" />
     </button>
   )
 }

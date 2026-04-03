@@ -6,7 +6,7 @@
       "runtimeExecutable": "C:/Users/hugos/.bun/bin/bun.exe",
       "runtimeArgs": ["dev"],
       "port": 3000,
-      "autoPort": false
+      "autoPort": true
     }
   ]
 }

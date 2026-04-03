@@ -8,7 +8,7 @@ import { ProgramBuilder } from "@/components/workout/ProgramBuilder"
 function Placeholder({ label }: { label: string }) {
   return (
     <div className="flex flex-1 items-center justify-center py-24">
-      <p className="text-xs uppercase tracking-[0.2em] text-[#555]">{label}</p>
+      <p className="text-xs uppercase tracking-[0.2em] text-[#444]">{label}</p>
     </div>
   )
 }
@@ -17,8 +17,8 @@ export default function Page() {
   const [tab, setTab] = useState<Tab>("today")
 
   return (
-    <div className="flex min-h-svh flex-col pb-20">
-      {tab === "today" && <TodayView />}
+    <div className="flex min-h-svh flex-col bg-[#0d0d0d] pb-20">
+      {tab === "today" && <TodayView onGoToProgram={() => setTab("program")} />}
       {tab === "program" && <ProgramBuilder />}
       {tab === "history" && <Placeholder label="Historique" />}
       {tab === "stats" && <Placeholder label="Stats" />}
